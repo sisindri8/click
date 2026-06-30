@@ -1,0 +1,25 @@
+server:
+  port: ${PORT:8084}
+
+spring:
+  application:
+    name: summarization-service
+
+claude:
+  mock-mode: true   # set to false once Claude API billing is ready
+  api:
+    base-url: https://api.anthropic.com
+    key: ${CLAUDE_API_KEY:not-set}
+  model:
+    haiku: claude-haiku-4-5-20251001     # used for summarization - good balance of cost and accuracy
+    sonnet: claude-sonnet-4-6            # upgrade to this if haiku accuracy isn't good enough
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+logging:
+  level:
+    com.click.summarization: INFO

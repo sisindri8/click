@@ -1,0 +1,32 @@
+server:
+  port: ${PORT:8085}
+
+spring:
+  application:
+    name: curation-service
+
+claude:
+  mock-mode: true   # set to false once Claude API billing is ready
+  api:
+    base-url: https://api.anthropic.com
+    key: ${CLAUDE_API_KEY:not-set}
+  model:
+    haiku: claude-haiku-4-5-20251001
+
+affiliate:
+  amazon:
+    # Your Amazon Associates tracking ID. Set via env var so it's not
+    # hardcoded - while this specific tag isn't a secret (it's visible in
+    # every link you share), keeping it in config rather than code still
+    # makes it easy to change without a rebuild.
+    associate-tag: ${AMAZON_ASSOCIATE_TAG:prodexa-21}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+logging:
+  level:
+    com.click.curation: INFO

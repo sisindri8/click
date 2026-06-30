@@ -1,0 +1,52 @@
+server:
+  port: ${PORT:8082}
+
+spring:
+  application:
+    name: youtube-search-service
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+youtube:
+  api:
+    base-url: https://www.googleapis.com/youtube/v3
+    key: ${YOUTUBE_API_KEY}   # set as environment variable
+  search:
+    # Replaced with real channel IDs found via web search - June 2026.
+    # NOTE: these are independently sourced from third-party stat sites, not
+    # verified directly via the YouTube API. Double-check the first real
+    # search response actually returns videos from the right channel name.
+    trusted-channels:
+      - id: "UCb-xXZ7ltTvrh9C6DgB9H-Q"
+        name: "Prasad Tech in Telugu"
+      - id: "UCBkYCgSTuzJmfyXVKEVfmJQ"
+        name: "Tharun Telugu Tech"
+      - id: "UCVELOLuREJkG81rsg9y9l8A"
+        name: "Best Tech in Telugu"
+      - id: "UCdqtTQjRs-aEZUIzcJrx2xw"
+        name: "Telugu Tech with Srinivas"
+      - id: "UCLqR-2tNtUEs0B-lcDf0_XA"
+        name: "Tech Report Telugu"
+    min-duration-seconds: 480    # 8 minutes
+    max-duration-seconds: 720    # 12 minutes - reduced from 20 to cut worst-case Whisper transcription time
+    max-age-months: 12
+    max-results-per-query: 5
+
+cache:
+  ttl:
+    search-results-hours: 24
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  health:
+    redis:
+      enabled: false   # disabled for now - we haven't wired actual Redis caching yet, no need for Redis running to test this service
+
+logging:
+  level:
+    com.click.youtubesearch: INFO

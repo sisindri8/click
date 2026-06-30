@@ -1,0 +1,21 @@
+# Whisper-only transcript pipeline. YouTube caption scraping was dropped -
+# YouTube blocks caption requests from cloud/datacenter IPs, which would
+# break this on any real deployment, not just in testing.
+#
+# NOTE: versions are intentionally NOT pinned. openai-whisper==20231117
+# (the original pin) fails to install on Python 3.13 due to a setup.py
+# bug unrelated to this project (KeyError: '__version__' during metadata
+# generation - a known issue with that old release predating Python 3.13).
+# Newer releases fixed this. If you need reproducible installs later,
+# pin to whatever version `pip show openai-whisper` reports after a
+# successful install on your machine.
+
+openai-whisper
+yt-dlp
+
+# IMPORTANT: Whisper also requires ffmpeg on your system PATH.
+# This is NOT a pip package - install it separately:
+#   Windows: https://www.gyan.dev/ffmpeg/builds/ (add the bin/ folder to PATH)
+#   Mac:     brew install ffmpeg
+#   Linux:   sudo apt install ffmpeg
+# Verify with: ffmpeg -version

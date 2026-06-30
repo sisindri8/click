@@ -1,0 +1,23 @@
+server:
+  port: ${PORT:8083}
+
+spring:
+  application:
+    name: transcript-service
+
+transcript:
+  mock-mode: true   # set to false once Python deps (Whisper, yt-dlp, ffmpeg) are installed locally - see README
+  python:
+    executable: ${PYTHON_EXECUTABLE:python3}   # use "python" on some Windows setups if "python3" isn't found
+    script-path: ${PYTHON_SCRIPT_PATH:python/fetch_transcript.py}
+    timeout-seconds: 300   # 5 mins - first run downloads ~460MB small model, subsequent runs are 20-40s on GPU
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+logging:
+  level:
+    com.click.transcript: INFO

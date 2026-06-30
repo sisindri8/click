@@ -1,0 +1,39 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: api-gateway
+
+# URLs of downstream microservices this gateway orchestrates.
+# Using config (not hardcoded strings in Java) means swapping to Docker
+# service names later (e.g. http://query-expansion-service:8081) is a
+# one-line change, not a code change.
+services:
+  query-expansion:
+    base-url: http://localhost:8081
+  youtube-search:
+    base-url: http://localhost:8082
+  transcript:
+    base-url: http://localhost:8083
+  summarization:
+    base-url: http://localhost:8084
+  curation:
+    base-url: http://localhost:8085
+
+pipeline:
+  # Whisper transcription is slow (10-90s per video on a laptop CPU), so we
+  # only fetch transcripts for the top N highest-ranked videos, not all of
+  # them. Increase this once Summarization Service exists and you want a
+  # fuller picture - or once this runs somewhere with real GPU/parallelism.
+  transcript-top-n-videos: 0   # disabled on Render demo deploy - transcript-service not deployed (heavy ffmpeg/Whisper build)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+logging:
+  level:
+    com.click.apigateway: INFO

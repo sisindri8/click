@@ -1,0 +1,197 @@
+version: '3.9'
+
+# Click — AI-powered product discovery engine
+# All 6 microservices + infrastructure in one compose file.
+#
+# Usage:
+#   Start:  docker-compose up --build
+#   Stop:   docker-compose down
+#   Logs:   docker-compose logs -f <service-name>
+#
+# Required environment variables (set in .env file or export before running):
+#   YOUTUBE_API_KEY   — YouTube Data API v3 key
+#   CLAUDE_API_KEY    — Anthropic Claude API key (optional if mock modes are on)
+#
+# The gateway is the only public-facing service (port 8080).
+# All other services communicate via Docker's internal network.
+
+services:
+
+  # ─── Infrastructure ──────────────────────────────────────────────────────────
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: click-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - click-network
+
+  # ─── Microservices ───────────────────────────────────────────────────────────
+
+  query-expansion-service:
+    build:
+      context: ./query-expansion-service
+      dockerfile: Dockerfile
+    container_name: click-query-expansion
+    ports:
+      - "8081:8081"
+    environment:
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY:-not-set}
+      - SPRING_APPLICATION_NAME=query-expansion-service
+    networks:
+      - click-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  youtube-search-service:
+    build:
+      context: ./youtube-search-service
+      dockerfile: Dockerfile
+    container_name: click-youtube-search
+    ports:
+      - "8082:8082"
+    environment:
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - click-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  transcript-service:
+    build:
+      context: ./transcript-service
+      dockerfile: Dockerfile
+    container_name: click-transcript
+    ports:
+      - "8083:8083"
+    environment:
+      - PYTHON_EXECUTABLE=python3
+      # script-path is relative to the working dir /app inside the container
+      - PYTHON_SCRIPT_PATH=python/fetch_transcript.py
+    networks:
+      - click-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s  # longer start_period - Whisper model may load on first request
+
+  summarization-service:
+    build:
+      context: ./summarization-service
+      dockerfile: Dockerfile
+    container_name: click-summarization
+    ports:
+      - "8084:8084"
+    environment:
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY:-not-set}
+    networks:
+      - click-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  curation-service:
+    build:
+      context: ./curation-service
+      dockerfile: Dockerfile
+    container_name: click-curation
+    ports:
+      - "8085:8085"
+    environment:
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY:-not-set}
+    networks:
+      - click-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: click-api-gateway
+    ports:
+      - "9090:8080"   # external 9090 (avoids common local port-8080 conflicts) -> internal 8080
+    environment:
+      # Override service URLs to use Docker service names instead of localhost
+      - SERVICES_QUERY-EXPANSION_BASE-URL=http://query-expansion-service:8081
+      - SERVICES_YOUTUBE-SEARCH_BASE-URL=http://youtube-search-service:8082
+      - SERVICES_TRANSCRIPT_BASE-URL=http://transcript-service:8083
+      - SERVICES_SUMMARIZATION_BASE-URL=http://summarization-service:8084
+      - SERVICES_CURATION_BASE-URL=http://curation-service:8085
+    depends_on:
+      query-expansion-service:
+        condition: service_healthy
+      youtube-search-service:
+        condition: service_healthy
+      transcript-service:
+        condition: service_healthy
+      summarization-service:
+        condition: service_healthy
+      curation-service:
+        condition: service_healthy
+    networks:
+      - click-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: click-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - PORT=80
+      - API_GATEWAY_URL=http://api-gateway:8080
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    networks:
+      - click-network
+
+# ─── Volumes ───────────────────────────────────────────────────────────────────
+
+volumes:
+  redis-data:
+    driver: local
+
+# ─── Networks ──────────────────────────────────────────────────────────────────
+
+networks:
+  click-network:
+    driver: bridge

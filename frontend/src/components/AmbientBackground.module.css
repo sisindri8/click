@@ -1,0 +1,43 @@
+.root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.orb1,
+.orb2,
+.orb3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+}
+
+.orb1 {
+  width: 700px;
+  height: 700px;
+  background: #7C4DFF;
+  opacity: 0.08;
+  top: -250px;
+  left: -200px;
+}
+
+.orb2 {
+  width: 600px;
+  height: 600px;
+  background: #E040FB;
+  opacity: 0.07;
+  bottom: -200px;
+  right: -150px;
+}
+
+.orb3 {
+  width: 400px;
+  height: 400px;
+  background: #FF6D00;
+  opacity: 0.05;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+}

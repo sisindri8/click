@@ -1,0 +1,112 @@
+services:
+  # ─── Redis ──────────────────────────────────────────────────────────────
+  - type: redis
+    name: click-redis
+    plan: free
+    ipAllowList: []
+
+  # ─── Query Expansion Service ───────────────────────────────────────────
+  - type: web
+    name: query-expansion-service
+    runtime: docker
+    plan: free
+    dockerfilePath: ./query-expansion-service/Dockerfile
+    dockerContext: ./query-expansion-service
+    envVars:
+      - key: CLAUDE_API_KEY
+        sync: false
+      - key: SPRING_APPLICATION_NAME
+        value: query-expansion-service
+    healthCheckPath: /actuator/health
+
+  # ─── YouTube Search Service ────────────────────────────────────────────
+  - type: web
+    name: youtube-search-service
+    runtime: docker
+    plan: free
+    dockerfilePath: ./youtube-search-service/Dockerfile
+    dockerContext: ./youtube-search-service
+    envVars:
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: SPRING_DATA_REDIS_HOST
+        fromService:
+          name: click-redis
+          type: redis
+          property: host
+      - key: SPRING_DATA_REDIS_PORT
+        fromService:
+          name: click-redis
+          type: redis
+          property: port
+    healthCheckPath: /actuator/health
+
+  # ─── Summarization Service ─────────────────────────────────────────────
+  - type: web
+    name: summarization-service
+    runtime: docker
+    plan: free
+    dockerfilePath: ./summarization-service/Dockerfile
+    dockerContext: ./summarization-service
+    envVars:
+      - key: CLAUDE_API_KEY
+        sync: false
+    healthCheckPath: /actuator/health
+
+  # ─── Curation Service ───────────────────────────────────────────────────
+  - type: web
+    name: curation-service
+    runtime: docker
+    plan: free
+    dockerfilePath: ./curation-service/Dockerfile
+    dockerContext: ./curation-service
+    envVars:
+      - key: CLAUDE_API_KEY
+        sync: false
+    healthCheckPath: /actuator/health
+
+  # ─── API Gateway ────────────────────────────────────────────────────────
+  - type: web
+    name: api-gateway
+    runtime: docker
+    plan: free
+    dockerfilePath: ./api-gateway/Dockerfile
+    dockerContext: ./api-gateway
+    envVars:
+      - key: SERVICES_QUERY-EXPANSION_BASE-URL
+        fromService:
+          name: query-expansion-service
+          type: web
+          property: hostport
+      - key: SERVICES_YOUTUBE-SEARCH_BASE-URL
+        fromService:
+          name: youtube-search-service
+          type: web
+          property: hostport
+      - key: SERVICES_TRANSCRIPT_BASE-URL
+        value: http://unused-transcript-service-disabled-for-demo:0
+      - key: SERVICES_SUMMARIZATION_BASE-URL
+        fromService:
+          name: summarization-service
+          type: web
+          property: hostport
+      - key: SERVICES_CURATION_BASE-URL
+        fromService:
+          name: curation-service
+          type: web
+          property: hostport
+    healthCheckPath: /actuator/health
+
+  # ─── Frontend ───────────────────────────────────────────────────────────
+  - type: web
+    name: click-frontend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: API_GATEWAY_URL
+        fromService:
+          name: api-gateway
+          type: web
+          property: hostport

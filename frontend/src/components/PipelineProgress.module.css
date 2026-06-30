@@ -1,0 +1,99 @@
+.root {
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 18px;
+}
+
+.steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.3;
+  transition: opacity 0.4s ease;
+}
+
+.step.active {
+  opacity: 1;
+}
+
+.step.done {
+  opacity: 0.55;
+}
+
+.dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-display);
+  color: var(--text-3);
+  flex-shrink: 0;
+  transition: all 0.35s ease;
+}
+
+.step.active .dot {
+  border-color: var(--violet);
+  background: rgba(124,77,255,0.15);
+  color: var(--violet-light);
+}
+
+.step.done .dot {
+  border-color: var(--green);
+  background: rgba(0,200,83,0.12);
+  color: var(--green);
+  font-size: 0.85rem;
+}
+
+.text {
+  font-size: 0.9rem;
+  color: var(--text-3);
+  transition: color 0.35s ease;
+}
+
+.step.active .text {
+  color: var(--text);
+}
+
+.step.done .text {
+  text-decoration: line-through;
+  text-decoration-color: rgba(96,96,128,0.4);
+}
+
+.spinner {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid rgba(124,77,255,0.3);
+  border-top-color: var(--violet);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

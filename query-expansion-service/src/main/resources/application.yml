@@ -1,0 +1,26 @@
+server:
+  port: ${PORT:8081}
+
+spring:
+  application:
+    name: query-expansion-service
+
+claude:
+  mock-mode: true   # set to false once you have a billed Claude API key ready - see README
+  api:
+    base-url: https://api.anthropic.com
+    key: ${CLAUDE_API_KEY:not-set}   # not required while mock-mode is true
+  model:
+    haiku: claude-haiku-4-5-20251001
+    sonnet: claude-sonnet-4-6
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+logging:
+  level:
+    com.click.queryexpansion: INFO
+    org.springframework.web.reactive.function.client: DEBUG

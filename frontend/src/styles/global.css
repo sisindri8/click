@@ -1,0 +1,74 @@
+/* ─── Reset ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ─── Design tokens ─────────────────────────────────────────────────────── */
+:root {
+  --bg:           #0A0A14;
+  --bg-elevated:  #12121E;
+  --surface:      #1A1A2E;
+  --surface-2:    #22223A;
+
+  --violet:       #7C4DFF;
+  --violet-light: #9C6FFF;
+  --pink:         #E040FB;
+  --amber:        #FFB300;
+  --green:        #00C853;
+  --red:          #FF5252;
+
+  --text:         #F0EFFF;
+  --text-2:       #A0A0C0;
+  --text-3:       #606080;
+
+  --border:       rgba(255,255,255,0.07);
+  --border-2:     rgba(255,255,255,0.12);
+  --border-violet: rgba(124,77,255,0.35);
+
+  --gradient:     linear-gradient(135deg, #7C4DFF 0%, #E040FB 100%);
+  --gradient-warm: linear-gradient(135deg, #E040FB 0%, #FF6D00 100%);
+  --gradient-text: linear-gradient(135deg, #9C6FFF 0%, #E040FB 100%);
+
+  --radius-sm:    8px;
+  --radius:       12px;
+  --radius-lg:    20px;
+  --radius-pill:  100px;
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  --transition:   0.2s ease;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: 3px; }
+
+/* ─── Selection ──────────────────────────────────────────────────────────── */
+::selection { background: rgba(124,77,255,0.35); color: var(--text); }
+
+/* ─── Focus ──────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+
+/* ─── Accessibility ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
