@@ -9,8 +9,8 @@ server {
     # e.g. https://api-gateway-xxxx.onrender.com on Render, or
     # http://api-gateway:8080 in local docker-compose.
     location /api {
-        proxy_pass http://${API_GATEWAY_URL};
-        proxy_set_header Host $host;
+        proxy_pass https://${API_GATEWAY_URL};
+        proxy_set_header Host ${API_GATEWAY_URL};
         proxy_set_header X-Real-IP $remote_addr;
     }
 
