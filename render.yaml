@@ -74,27 +74,15 @@ services:
     dockerContext: ./api-gateway
     envVars:
       - key: SERVICES_QUERY-EXPANSION_BASE-URL
-        fromService:
-          name: query-expansion-service
-          type: web
-          property: hostport
+        sync: false  # set manually in Render dashboard: full https://<service>.onrender.com URL
       - key: SERVICES_YOUTUBE-SEARCH_BASE-URL
-        fromService:
-          name: youtube-search-service
-          type: web
-          property: hostport
+        sync: false  # set manually in Render dashboard: full https://<service>.onrender.com URL
       - key: SERVICES_TRANSCRIPT_BASE-URL
         value: http://unused-transcript-service-disabled-for-demo:0
       - key: SERVICES_SUMMARIZATION_BASE-URL
-        fromService:
-          name: summarization-service
-          type: web
-          property: hostport
+        sync: false  # set manually in Render dashboard: full https://<service>.onrender.com URL
       - key: SERVICES_CURATION_BASE-URL
-        fromService:
-          name: curation-service
-          type: web
-          property: hostport
+        sync: false  # set manually in Render dashboard: full https://<service>.onrender.com URL
     healthCheckPath: /actuator/health
 
   # ─── Frontend ───────────────────────────────────────────────────────────
@@ -106,7 +94,4 @@ services:
     dockerContext: ./frontend
     envVars:
       - key: API_GATEWAY_URL
-        fromService:
-          name: api-gateway
-          type: web
-          property: hostport
+        sync: false  # set manually in Render dashboard: hostname only, e.g. api-gateway-xxxx.onrender.com
