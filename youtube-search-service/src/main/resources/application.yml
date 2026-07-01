@@ -21,12 +21,8 @@ youtube:
     trusted-channels:
       - id: "UCb-xXZ7ltTvrh9C6DgB9H-Q"
         name: "Prasad Tech in Telugu"
-      - id: "UCBkYCgSTuzJmfyXVKEVfmJQ"
-        name: "Tharun Telugu Tech"
       - id: "UCVELOLuREJkG81rsg9y9l8A"
         name: "Best Tech in Telugu"
-      - id: "UCdqtTQjRs-aEZUIzcJrx2xw"
-        name: "Telugu Tech with Srinivas"
       - id: "UCLqR-2tNtUEs0B-lcDf0_XA"
         name: "Tech Report Telugu"
     min-duration-seconds: 480    # 8 minutes

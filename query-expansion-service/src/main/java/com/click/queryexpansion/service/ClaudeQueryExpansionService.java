@@ -93,10 +93,7 @@ public class ClaudeQueryExpansionService {
 
         List<String> fakeVariations = List.of(
                 userQuery + " 2024",
-                "best " + userQuery,
-                userQuery + " review",
-                "top " + userQuery,
-                userQuery + " comparison"
+                "best " + userQuery
         );
         return new QueryExpansionResponse(userQuery, fakeVariations, category);
     }
@@ -106,7 +103,7 @@ public class ClaudeQueryExpansionService {
         // tokens cheap (see cost optimization notes). Forces JSON-only output so
         // we don't have to do fragile text parsing.
         return """
-                Generate 5 alternative search phrasings for this query, plus detect its product category.
+                Generate 2 alternative search phrasings for this query, plus detect its product category.
                 Query: "%s"
 
                 Rules:
@@ -115,7 +112,7 @@ public class ClaudeQueryExpansionService {
                 - Return ONLY valid JSON, no extra text, no markdown fences
 
                 Schema:
-                {"category": "string", "variations": ["string", "string", "string", "string", "string"]}
+                {"category": "string", "variations": ["string", "string"]}
                 """.formatted(userQuery);
     }
 
